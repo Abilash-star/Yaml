@@ -27,16 +27,15 @@
          - "{{ supp_grp }}"   
       when: inventory_hostname in groups['Webserver'] and item.uid is search(1*)
       
-   - authorized_key:
-       user: "{{ item.username }}"
-       state: present
-       manage_dir: yes
-       key: "{{ lookup('file', '/home/~/.ssh/id_ed21.pub') }}"
-       with_items: 
+    - authorized_key:
+        user: "{{ item.username }}"
+        state: present
+         manage_dir: yes
+        key: "{{ lookup('file', '/home/~/.ssh/id_ed21.pub') }}"
+      with_items: 
          - "{{ users }}"    
       when: inventory_hostname in groups['Webserver'] and item.uid is search(1*)
   
-
     - name: Pull data for users with ID 2
       user: 
         name: "{{ item.username }}"
