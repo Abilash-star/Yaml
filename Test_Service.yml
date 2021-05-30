@@ -1,0 +1,46 @@
+---
+- hosts: Linux
+  become: yes
+  become_method: enable 
+  tasks:
+    - name: Start DB service
+      service: 
+        name: db_service
+        state: started
+        enabled: yes   
+      register: start_db_service      
+      
+    - name: Start App service
+      service: 
+        name: app_service
+        state: started
+        enabled: yes 
+      notify: Restart App Service
+      register: start_app_service
+      when: start_db_service is defined and  start_db_service.state == "running"     
+      
+    - name: Start Web service
+      service: 
+        name: web_service
+        state: started
+        enabled: yes
+      notify: Restart Web Service  
+      register: start_web_service  
+      when: start_web_service is defined and start_web_service.state == "running"        
+      
+  handlers:
+    - name: Restart App Service
+      service: 
+        name: app_service
+        state: restarted
+        enabled: yes 
+      register: restart_app_service
+      when: start_app_service is defined and start_app_service.state == "stopped"      
+      
+    - name: Restart Web Service
+      service: 
+        name: web_service
+        state: restarted
+        enabled: yes
+      register: restart_web_service
+      when: start_web_service is defined and start_web_service.state == "stopped" and restart_app_service is defined and restart_app_service.state == "running"
