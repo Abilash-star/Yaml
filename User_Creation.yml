@@ -14,6 +14,7 @@
     - name: Pull data for users with ID 1
       user: 
         name: "{{ item.username }}"
+        uid: "{{ item.uid }}"
         password: "{{ user_password | password_hash('sha512') }}"
         shell: /bin/bash
         group: "{{ item.name }}"
@@ -21,24 +22,16 @@
         groups: sudo
         append: yes
         generate_ssh_key: yes
-        ssh_key_type: ed21
+        ssh_key_type: rsa
       with_items: 
          - "{{ users }}" 
          - "{{ supp_grp }}"   
-      when: inventory_hostname in groups['Webserver'] and item.uid is search(1*)
-      
-    - authorized_key:
-        user: "{{ item.username }}"
-        state: present
-        manage_dir: yes
-        key: "{{ lookup('file', '/home/~/.ssh/id_ed21.pub') }}"
-      with_items: 
-         - "{{ users }}"    
       when: inventory_hostname in groups['Webserver'] and item.uid is search(1*)
   
     - name: Pull data for users with ID 2
       user: 
         name: "{{ item.username }}"
+        uid: "{{ item.uid }}"
         password: "{{ user_password | password_hash('sha512') }}"
         shell: /bin/bash
         group: "{{ item.name }}"
@@ -46,22 +39,20 @@
         groups: sudo
         append: yes
         generate_ssh_key: yes
-        ssh_key_type: ed21
+        ssh_key_type: rsa
       with_items: 
          - "{{ users }}" 
          - "{{ supp_grp }}"
       when: inventory_hostname in groups['DBserver'] and item.uid is search(2*)
-
-    - authorized_key:
-       user: "{{ item.username }}"
-       state: present
-       manage_dir: yes
-       key: "{{ lookup('file', '/home/~/.ssh/id_ed21.pub') }}"
-       with_items: 
-         - "{{ users }}"      
-       when: inventory_hostname in groups['DBserver'] and item.uid is search(2*)
       
-
+    - authorized_key:
+        user: "{{ item.username }}"
+        state: present
+        manage_dir: yes
+        key: "{{ lookup('file', '/home/~/.ssh/id_rsa.pub') }}"
+      with_items: 
+         - "{{ users }}"   
+         
     - template:
         src: "{{ sshd_key_copy }}"
         dest: /etc/ssh/sshd_config
