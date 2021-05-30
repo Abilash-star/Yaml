@@ -1,0 +1,38 @@
+---
+- name: Group servers with inventory file and create user profiles as per the requirement 
+  hosts: all
+  become: true
+  vars:
+    group: "Adding all the supplementary group fields or can be dynamically retrieved"  
+  vars_files:
+    - "{{ /home/automation/plays/secret.yml }}"
+    - "{{ /home/automation/plays/vars/user_list.yml }}"    
+   
+  tasks:
+    - name: Pull data for users with ID 1
+      user: 
+        name: "{{ item }}"
+        password: "{{ user_password | password_hash('sha512') }}"
+        shell: /bin/bash
+        group: {{ user }}
+        update_password: on_create
+        groups: sudo
+        append: yes
+        generate_ssh_key: yes
+      with_items:
+         -  "{{ users.username }}"   
+      when: inventory_hostname in groups['Webserver'] and users.username.uid is search(1*)
+
+    - name: Pull data for users with ID 2
+      user: 
+        name: "{{ item }}"
+        password: "{{ user_password | password_hash('sha512') }}"
+        shell: /bin/bash
+        group: {{ user }}
+        update_password: on_create
+        groups: sudo
+        append: yes
+        generate_ssh_key: yes
+      with_items:
+         -  "{{ users.username }}" 
+      when: inventory_hostname in groups['DBserver'] and users.username.uid is search(2*)
