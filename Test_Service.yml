@@ -1,3 +1,4 @@
+# Implement handlers for service status and taking appropriate actions.
 ---
 - hosts: Linux
   become: yes
