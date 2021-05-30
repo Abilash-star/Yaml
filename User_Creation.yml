@@ -3,7 +3,7 @@
   hosts: all
   become: true
   vars:
-    group: "Adding all the supplementary group fields or can be dynamically retrieved"  
+    supp_grp: "Adding all the supplementary group fields or can be dynamically retrieved"  
   vars_files:
     - "{{ /home/automation/plays/secret.yml }}"
     - "{{ /home/automation/plays/vars/user_list.yml }}"    
@@ -14,7 +14,7 @@
         name: "{{ item }}"
         password: "{{ user_password | password_hash('sha512') }}"
         shell: /bin/bash
-        group: {{ user }}
+        group: "{{ supp_grp }}"
         update_password: on_create
         groups: sudo
         append: yes
@@ -28,7 +28,7 @@
         name: "{{ item }}"
         password: "{{ user_password | password_hash('sha512') }}"
         shell: /bin/bash
-        group: {{ user }}
+        group: "{{ supp_grp }}"
         update_password: on_create
         groups: sudo
         append: yes
